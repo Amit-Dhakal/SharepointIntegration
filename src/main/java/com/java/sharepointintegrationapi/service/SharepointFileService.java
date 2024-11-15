@@ -2,10 +2,7 @@ package com.java.sharepointintegrationapi.service;
 
 import java.io.IOException;
 import java.util.List;
-
 import com.java.sharepointintegrationapi.dto.SharePointDetail;
-
-
 
 public interface SharepointFileService {
 

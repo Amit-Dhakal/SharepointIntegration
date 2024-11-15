@@ -11,8 +11,7 @@ public class Constants {
     public static String shared_folder="Shared Documents";
     public static final String site = "/sites/raju-dev";
 	
+    //https://malabarai-my.sharepoint.com/:f:/g/personal/donaldsoo_koizai_com
 
-    
 
-    
 }

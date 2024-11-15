@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
@@ -19,15 +18,18 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.assertj.core.util.Lists;
-
 import com.java.sharepointintegrationapi.util.Constants;
+import com.java.sharepointintegrationapi.util.Credentials;
+
 
 public class ConnectionService {
 
     public static String getToken() {
         CloseableHttpClient httpClient = HttpClients.createDefault();
+    	
+    	//OkHttpClient httpClient = new OkHttpClient();
+    	
         List<String> bearerRealmAndResourceId = getBearerRealmAndResourceId(httpClient);
-
         String bearerRealm = bearerRealmAndResourceId.get(0);
         String resourceId = bearerRealmAndResourceId.get(1);
 
@@ -38,10 +40,11 @@ public class ConnectionService {
         String url = "https://accounts.accesscontrol.windows.net/" + bearerRealm + "/tokens/OAuth/2";
 
         HttpPost postRequest = new HttpPost(url);
+        
         postRequest.setHeader("Content-Type", "application/x-www-form-urlencoded");
 
         String clientId = String.format("%s@%s", Constants.clientId, bearerRealm);
-        String resource = String.format("%s/%s@%s", resourceId, Constants.domain + ".sharepoint.com", bearerRealm);
+        String resource = String.format("%s/%s@%s", resourceId, Credentials.domain + ".sharepoint.com", bearerRealm);
 
         List<NameValuePair> params = Lists.newArrayList(
                 new BasicNameValuePair("grant_type", "client_credentials"),
@@ -52,6 +55,7 @@ public class ConnectionService {
 
         try {
             postRequest.setEntity(new UrlEncodedFormEntity(params));
+            
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
@@ -78,14 +82,22 @@ public class ConnectionService {
 
 
     private static List<String> getBearerRealmAndResourceId(CloseableHttpClient httpClient) {
-        String url = String.format("https://%s/_layouts/15/sharepoint.aspx", Constants.domain + ".sharepoint.com");
+        String url = String.format("https://%s/_layouts/15/sharepoint.aspx", Credentials.domain + ".sharepoint.com");
 
-        List<String> res = new ArrayList<>();
+        List<String> res = new ArrayList<>(); 
+         
         HttpGet getRequest = new HttpGet(url);
-        getRequest.setHeader("Authorization", "Bearer");
+       
+      //Request getRequest = new Request.Builder().url(url).addHeader("Authorization", "Bearer").build(); // defaults to GET
+
+         getRequest.setHeader("Authorization", "Bearer");
+        
 
         try {
+        	
             HttpResponse response = httpClient.execute(getRequest);
+        	//Response response = client.newCall(request).execute();
+        	
             Header[] headers = response.getHeaders("www-authenticate");
 
             String bearerRealm = extractHeaderElement(headers, "Bearer realm");
@@ -97,6 +109,11 @@ public class ConnectionService {
             throw new RuntimeException("error : ", ex);
         }
     }
+    
+    
+    
+    
+    
 
     private static String extractHeaderElement(Header[] headers, String bearer_realm) throws Exception {
         return Arrays.stream(headers)

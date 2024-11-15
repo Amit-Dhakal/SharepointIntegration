@@ -1,11 +1,12 @@
 package com.java.sharepointintegrationapi.util;
 
 import lombok.Data;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FolderList {
 
     public static Node getNode(File node) {
